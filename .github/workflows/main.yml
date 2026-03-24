@@ -21,10 +21,15 @@ jobs:
         # 인증서 없이 빌드가 '성공'하는지만 체크하는 핵심 명령어
         run: flutter build ios --release --no-codesign
 
-      # ... 이전 단계들 아래에 추가 ...
-      - name: Upload Build Artifact
+      # 🚀 여기서부터가 중요합니다: 윈도우 대신 깃허브(맥)가 직접 .ipa를 만듭니다.
+      - name: Create IPA Structure
+        run: |
+          mkdir -p Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          zip -r app.ipa Payload
+          
+      - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-app-bundle
-          # 빌드된 결과물 폴더 전체를 압축해서 올립니다.
-          path: build/ios/iphoneos/Runner.app
+          name: ios-ipa-file
+          path: app.ipa
